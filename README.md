@@ -1,3 +1,6 @@
-# gibbs_sampler
-# gibbs_sampler
-# gibbs_sampler
+# Final Project group 11: Gibbs sampler
+
+## Introduction
+
+
+
