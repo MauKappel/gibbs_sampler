@@ -1,4 +1,4 @@
-cp -R data non-binders
+cp -R raw_data non-binders
 cd non-binders
 for file in */*
 do
