@@ -6,7 +6,15 @@ from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import pandas as pd
+from argparse import ArgumentParser
 
+parser = ArgumentParser(description="GibbsSampler evaluation")
+
+parser.add_argument("-p", action="store", dest="eval_peptides_file", type=str, help="File with predicted data")
+parser.add_argument("-e", action="store", dest="eval_targets_file", type=str, help="File with evaluation data")
+args = parser.parse_args()
+eval_targets_file = args.eval_targets_file
+eval_peptides_file = args.eval_peptides_file
 
 def plot_roc_curve():
     plt.title('Receiver Operating Characteristic')
@@ -17,8 +25,8 @@ def plot_roc_curve():
     plt.xlabel('False Positive Rate')
 
 
-eval_targets = np.loadtxt(eval_targets_file, dtype=str)
-eval_peptides = np.loadtxt(eval_peptidesfile, dtype=str)
+eval_targets = np.loadtxt(eval_targets_file, dtype=str)[:,1]
+eval_peptides = np.loadtxt(eval_peptides_file, dtype=str)[:,1]
 
 eval_targets_class = np.where(eval_targets > 0.426, 1, 0)
 eval_peptides_class = np.where(eval_peptides > 0.426, 1, 0)
