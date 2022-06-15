@@ -44,8 +44,8 @@ infile_list.pop()
 #results_dir = script_path + "/../results/" + method
 os.makedirs(results_dir)
 job_list = []
-for allele in infile_list:
-    if allele in allele:
+for element in infile_list:
+    if allele in element:
         os.makedirs(results_dir + "/" + allele)
         if method == "hobohm2":
             hobohm_dir = os.path.join(script_path, "../data/hobohm2/" + allele)
@@ -70,4 +70,4 @@ for allele in infile_list:
                            stdout=subprocess.PIPE, universal_newlines=True)
             job_list.append("python3 03_gibbs_sampler.py -f " + training_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat)
 
-result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
+#result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
