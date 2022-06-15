@@ -10,8 +10,9 @@ parser = ArgumentParser(description="GibbsSampler")
 parser.add_argument("-b", action="store", dest="beta", type=float, default=50.0,help="Weight on pseudo count (default: 50.0)")
 parser.add_argument("-w", action="store_true", dest="sequence_weighting", help="Use Sequence weighting")
 parser.add_argument("-f", action="store", dest="peptides_file", type=str, help="File with peptides")
-parser.add_argument("-o", action="store", dest="out_file_name", type=str, help="Output file")
-parser.add_argument("-i", action="store", dest="iters_per_point", type=int,  default=6,help="Number of iteration per data point")
+parser.add_argument("-o1", action="store", dest="out_file_kld", type=str, help="Output file for the kld scores")
+parser.add_argument("-o2", action="store", dest="out_file_mat", type=str, help="Output file for the PSSM")
+parser.add_argument("-i", action="store", dest="iters_per_point", type=int,  default=6, help="Number of iteration per data point")
 parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed")
 parser.add_argument("-Ts", action="store", dest="T_i", type=float, default=1.0, help="Start Temp")
 parser.add_argument("-Te", action="store", dest="T_f", type=float, default=0.0001, help="End Temp")
@@ -20,7 +21,8 @@ args = parser.parse_args()
 beta = args.beta
 sequence_weighting = args.sequence_weighting
 peptides_file = args.peptides_file
-out_file_name = args.out_file_name
+out_file_kld = args.out_file_kld
+out_file_mat = args.out_file_mat
 iters_per_point = args.iters_per_point
 seed = args.seed
 T_i = args.T_i
@@ -308,7 +310,7 @@ def to_psi_blast(matrix, out_file_name):
 # In[ ]:
 
 np.random.seed( seed )
-
+out_file_1 = open(out_file_kld, "w")
 core_len = 9
 
 # get peptides
@@ -321,11 +323,11 @@ T = np.linspace(T_i,T_f,T_steps )
 # Define number of iterations per temperature step
 iters = len(peptides)*iters_per_point
 
-print( "# beta:", beta )
-print( "# Sequence weighting:", sequence_weighting )
-print( "# iters_per_point:", iters_per_point )
-print( "# Seed:", seed )
-print( "# Temperature:", T )
+print( "# beta:", beta, file = out_file_1)
+print( "# Sequence weighting:", sequence_weighting, file = out_file_1)
+print( "# iters_per_point:", iters_per_point, file = out_file_1)
+print( "# Seed:", seed, file = out_file_1)
+print( "# Temperature:", T, file = out_file_1)
 
 # initialize matrices
 c_matrix = initialize_matrix(core_len, alphabet)
@@ -338,7 +340,7 @@ w_matrix = initialize_matrix(core_len, alphabet)
 log_odds_matrix, peptide_scores, _ = get_log_odds(peptides, alphabet, bg, blosum62, core_len, c_matrix, f_matrix, g_matrix, p_matrix, w_matrix)
 
 # initial kld score
-print( "Initial KLD score: " + str(peptide_scores))
+print( "Initial KLD score: " + str(peptide_scores), file = out_file_1)
 kld = []
 kld.append( peptide_scores )
 
@@ -409,10 +411,11 @@ for t in T:
         else:
             if debug: print("Can't shift peptide, it is a " + str(core_len) + "mer")
               
-    print( "KLD score t: " + str(t) + " KLD: " + str(peptide_scores))
+    print( "KLD score t: " + str(t) + " KLD: " + str(peptide_scores), file = out_file_1)
     
 t1 = time()
 
-print("Time elapsed (m):", (t1-t0)/60)
+print("Time elapsed (m):", (t1-t0)/60, file = out_file_1)
 
-to_psi_blast(log_odds_matrix, out_file_name)
+to_psi_blast(log_odds_matrix, out_file_mat)
+out_file_1.close()
