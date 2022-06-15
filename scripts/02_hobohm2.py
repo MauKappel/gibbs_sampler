@@ -1,12 +1,10 @@
 import numpy as np
 import os
 from argparse import ArgumentParser
-import sys
-import matplotlib.pylab as plt
+import random
 
 parser = ArgumentParser(description="Alignment_O2, if only q or db is provided, sequences will be align within file")
-parser.add_argument("-q", action="store", dest="query_file", default=None, help="File with query sequence")
-parser.add_argument("-db", action="store", dest="db_file", default=None,help="File with database sequence")
+parser.add_argument("-f", action="store", dest="FILE", default=None, help="File with query sequence")
 parser.add_argument("-go", action="store", dest="gap_open", type=float, default=-11.0, help="Value of gap open (-11.0)")
 parser.add_argument("-debug", action="store", dest="DEBUG", type=bool, default=False, help="only align a small number of sequences")
 parser.add_argument("-ge", action="store", dest="gap_extension", type=float, default=-1.0,
@@ -18,21 +16,7 @@ gap_open = args.gap_open
 gap_extension = args.gap_extension
 
 ## If only one file is provided allign all vs all within the file, else align 2 files
-if args.db_file == None and args.query_file == None:
-    print('provide alignment file')
-    sys.exit()
-
-elif args.query_file == None:
-    query_file = args.db_file
-    database_file = args.db_file
-
-elif args.db_file == None:
-    database_file = args.query_file
-    query_file = args.query_file
-
-else:
-    query_file = args.query_file
-    database_file = args.db_file
+file = args.FILE
 
 script_path = os.getcwd()
 data_dir = os.path.join(script_path, '../data/')
@@ -216,16 +200,13 @@ def smith_waterman_traceback(E_matrix, D_matrix, i_max, j_max, query="VLLP", dat
     return aligned_query, aligned_database, matches
 
 
-### Align query against database#
-
+### Align query against database
 if args.DEBUG == False:
-    print(f'aligning {query_file} vs {database_file}')
-    query_list = np.loadtxt(query_file, dtype=str, delimiter=' ').reshape(-1, 2)
-    database_list = np.loadtxt(database_file, dtype=str).reshape(-1, 2)
+    print(f'aligning peptides all vs all in {args.FILE}')
+    peptide_list = np.loadtxt(args.FILE, dtype=str, delimiter=' ').reshape(-1, 2)
 else:
     print('debug_mode')
-    query_list = np.loadtxt(query_file, dtype=str, delimiter=' ').reshape(-1, 2)[0:100]
-    database_list = np.loadtxt(database_file, dtype=str).reshape(-1, 2)[0:100]
+    peptide_list = np.loadtxt(args.FILE, dtype=str, delimiter=' ').reshape(-1, 2)[0:15]
 
 
 from time import time
@@ -235,11 +216,11 @@ scoring_scheme = blosum50
 # this returns current timestamp in seconds
 t0 = time()
 all_matches = []
-match_matrix = np.zeros((len(query_list), len(database_list)))
-for m, query in enumerate(query_list):
+match_matrix = np.zeros((len(peptide_list), len(peptide_list)))
+for m, query in enumerate(peptide_list):
     query_sequence = query[0]
 
-    for n, database in enumerate(database_list):
+    for n, database in enumerate(peptide_list):
         database_sequence = database[0]
 
         P_matrix, Q_matrix, D_matrix, E_matrix, i_max, j_max, max_score = smith_waterman_alignment(query_sequence,
@@ -250,29 +231,43 @@ for m, query in enumerate(query_list):
         aligned_query, aligned_database, matches = smith_waterman_traceback(E_matrix, D_matrix, i_max, j_max,
                                                                             query_sequence, database_sequence, gap_open,
                                                                             gap_extension)
-        '''
-        TODO:
-        - change the code so it only accepts one file
-        - calculate the sum of the rows, remove the rows and corresponding column which have the highest count
-        
-        NOTE: 
-        - Theshold greater than 80% matches will be a 1, lower than 80% matches will be 0
-        '''
-        #print("ALN", query_sequence, len(query_sequence), database_sequence, len(database_sequence), len(aligned_query),
-              #matches, max_score)
-        #print("QAL", i_max, ''.join(aligned_query))
-        #print("DAL", j_max, ''.join(aligned_database))
-        if query_sequence != database_sequence:
-            if matches > args.thresh * len(query_sequence):
-                all_matches.append(matches)
-                match_matrix[m][n] = 1
-            else:
-                all_matches.append(matches)
-                match_matrix[m][n] = 0
+
+        if matches > args.thresh * len(query_sequence):
+            all_matches.append(matches)
+            match_matrix[m][n] = 1
+        else:
+            all_matches.append(matches)
+            match_matrix[m][n] = 0
 
 t1 = time()
 print("Time (m):,", (t1 - t0) / 60)
-print(match_matrix)
-print(np.apply_along_axis(sum, axis=1, arr=match_matrix))
-plt.hist(all_matches)
-plt.savefig('../results/02_alignement_matches.png')
+print("-------------------alignment completed-------------------")
+
+# Hobohm2 main loop
+match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
+drop_list = ['start the loop']
+while len(drop_list) > 0:
+    # indices of of rows/columns that should be dropped
+    num_matches = []
+    drop_list = []
+    for i, match in enumerate(match_vector):
+        if match > 1.0:
+            drop_list.append(i)
+            num_matches.append(match)
+
+    if len(drop_list) > 0:
+        # drop elements first which have the most matches
+        drop_idx = random.choice([drop_list[i] for i, x in enumerate(num_matches) if x == max(num_matches)])
+
+        # delete row and column
+        match_matrix = np.delete(match_matrix, drop_idx, 0)
+        match_matrix = np.delete(match_matrix, drop_idx, 1)
+
+        # drop peptide from peptide list
+        peptide_list = np.delete(peptide_list, drop_idx, 0)
+
+        # recalculate math vector
+        match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
+
+print(peptide_list.shape)
+
