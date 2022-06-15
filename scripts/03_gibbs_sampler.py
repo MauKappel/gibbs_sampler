@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from time import time
 
@@ -9,6 +10,7 @@ parser = ArgumentParser(description="GibbsSampler")
 parser.add_argument("-b", action="store", dest="beta", type=float, default=50.0,help="Weight on pseudo count (default: 50.0)")
 parser.add_argument("-w", action="store_true", dest="sequence_weighting", help="Use Sequence weighting")
 parser.add_argument("-f", action="store", dest="peptides_file", type=str, help="File with peptides")
+parser.add_argument("-o", action="store", dest="out_file_name", type=str, help="Output file")
 parser.add_argument("-i", action="store", dest="iters_per_point", type=int,  default=6,help="Number of iteration per data point")
 parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed")
 parser.add_argument("-Ts", action="store", dest="T_i", type=float, default=1.0, help="Start Temp")
@@ -18,6 +20,7 @@ args = parser.parse_args()
 beta = args.beta
 sequence_weighting = args.sequence_weighting
 peptides_file = args.peptides_file
+out_file_name = args.out_file_name
 iters_per_point = args.iters_per_point
 seed = args.seed
 T_i = args.T_i
@@ -29,7 +32,8 @@ T_steps = args.T_steps
 
 # In[37]:
 
-data_dir = "/Users/mniel/Courses/Algorithms_in_Bioinf/ipython/data/"
+script_path = os.getcwd()
+data_dir = os.path.join(script_path, '../data/')
 
 # ## Data imports
 
@@ -48,7 +52,7 @@ bg = {}
 for i in range(0, len(alphabet)):
     bg[alphabet[i]] = _bg[i]
 
-blosum_file = data_dir + "Matrices//blosum62.freq_rownorm"
+blosum_file = data_dir + "Matrices/blosum62.freq_rownorm"
 
 _blosum62 = np.loadtxt(blosum_file, dtype=float).reshape((20, 20)).T
 
@@ -238,8 +242,8 @@ def score_peptide(peptide, core_start, core_len, matrix):
 def load_peptide_data():
     
     # Remove peptides shorter than core_len
-    raw_peptides = np.loadtxt(peptides_file, dtype=str).tolist()
-
+    raw_peptides = np.loadtxt(peptides_file, dtype=str).reshape(-1,2)
+    raw_peptides = raw_peptides[:, 0]
     # only keep peptides with length equal to or longer than core_len
     peptides = []
     for i in range(0, len(raw_peptides)):
@@ -275,11 +279,11 @@ def load_peptide_data():
 
 # In[43]:
 
-def to_psi_blast(matrix):
-
+def to_psi_blast(matrix, out_file_name):
+    output_file = open(out_file_name, "w")
     header = ["", "A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
 
-    print('{:>4} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*header)) 
+    print('{:>4} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*header), file = output_file)
 
     letter_order = ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
 
@@ -295,7 +299,8 @@ def to_psi_blast(matrix):
 
             scores.append(round(score, 4))
 
-        print('{:>4} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*scores)) 
+        print('{:>4} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*scores), file = output_file)
+    output_file.close()
 
 
 # ## Main loop
@@ -410,4 +415,4 @@ t1 = time()
 
 print("Time elapsed (m):", (t1-t0)/60)
 
-to_psi_blast(log_odds_matrix)
+to_psi_blast(log_odds_matrix, out_file_name)

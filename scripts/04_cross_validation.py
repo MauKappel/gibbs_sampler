@@ -6,8 +6,6 @@
 import os
 import random
 import subprocess
-import numpy as np
-import math
 from argparse import ArgumentParser
 
 ## PARSER
@@ -44,4 +42,10 @@ for element in infile_list:
             training_index = [1, 2, 3, 4]
             training_index.remove(i)
             test_file = allele_dir + str(i)
-            training_file =
+            training_file = data_dir + element + "/training_file_" + str(i)
+            out_file_name = data_dir + element + "/mat_file_" + str(i)
+            subprocess.run(['cat ' + allele_dir + str(training_index[0]) + " " + allele_dir + str(training_index[1]) +
+                            " " + allele_dir + str(training_index[2]) + " > " + training_file], shell=True,
+                           stdout=subprocess.PIPE, universal_newlines=True)
+            subprocess.run(['python3 03_gibbs_sampler.py -f ' + training_file + " -o " + out_file_name], shell=True,
+                           stdout=subprocess.PIPE, universal_newlines=True)
