@@ -6,15 +6,27 @@ from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import pandas as pd
-from argparse import ArgumentParser
+import logomaker as lm
+import os
+
 
 parser = ArgumentParser(description="GibbsSampler evaluation")
 
 parser.add_argument("-p", action="store", dest="eval_peptides_file", type=str, help="File with predicted data")
 parser.add_argument("-e", action="store", dest="eval_targets_file", type=str, help="File with evaluation data")
+parser.add_argument("-mat", action="store", dest="psi_blast_file", type=str, help="File containing weighted scores")
+
 args = parser.parse_args()
 eval_targets_file = args.eval_targets_file
 eval_peptides_file = args.eval_peptides_file
+psi_blast_file = args.psi_blast_file
+
+script_path = os.getcwd()
+data_dir = script_path + "/"
+
+#------------------------------------------------------------------------------------#
+# ROC curve
+#------------------------------------------------------------------------------------#
 
 def plot_roc_curve():
     plt.title('Receiver Operating Characteristic')
@@ -24,12 +36,14 @@ def plot_roc_curve():
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
 
-
+eval_targets_file = data_dir + eval_targets_file
 eval_targets = np.loadtxt(eval_targets_file, dtype=str)[:,1]
+eval_peptides_file = data_dir + eval_peptides_file
 eval_peptides = np.loadtxt(eval_peptides_file, dtype=str)[:,1]
 
-eval_targets_class = np.where(eval_targets > 0.426, 1, 0)
-eval_peptides_class = np.where(eval_peptides > 0.426, 1, 0)
+
+eval_targets_class = np.where(float(eval_targets) > 0.426, 1, 0)
+eval_peptides_class = np.where(float(eval_peptides) > 0.426, 1, 0)
 # Combining targets and prediction values with peptide length in a dataframe
 
 plt.figure(figsize=(7, 7))
@@ -38,6 +52,9 @@ fpr, tpr, threshold = roc_curve(eval_targets_class, eval_peptides_class)
 roc_auc = auc(fpr, tpr)
 plot_roc_curve()
 
+#------------------------------------------------------------------------------------#
+# MCC
+#------------------------------------------------------------------------------------#
 mcc = matthews_corrcoef(eval_targets_class, eval_peptides_class)
 
 
@@ -56,3 +73,76 @@ pcc = pearsonr(eval_targets, eval_peptides)
 print("PCC: ", pcc[0])
 
 plt.scatter(eval_peptides, eval_targets);
+
+
+#------------------------------------------------------------------------------------#
+# Functions
+#------------------------------------------------------------------------------------#
+peptide_length = len(eval_peptides[0])
+#peptide_length = 9
+
+def SeqPlot(weight_matrix):
+    """
+    Creates a simple sequence logo from a weight matrix
+    Weight matrix is produced via 'from_psi_blast' function
+    """
+    SeqPlot = lm.Logo(df = pd.DataFrame(weight_matrix),
+                      fade_below=0.5,
+                      shade_below=0.5,
+                      figsize=(15,7))
+    
+    # set axis labels
+    SeqPlot.ax.set_xlabel('Amino acid position', fontsize=14)
+    SeqPlot.ax.set_ylabel('bits', fontsize=14)
+    
+    # Highlighting specific or range of amino acids
+    #SeqPlot.highlight_position(2,color='lightgray',alpha=0.5)
+    #SeqPlot.highlight_position_range(2,6,alpha=0.5,color='lightgray')
+    return SeqPlot
+    
+def initialize_matrix(peptide_length, alphabet):
+    init_matrix = [0]*peptide_length
+
+    for i in range(0, peptide_length):
+
+        row = {}
+
+        for letter in alphabet: 
+            row[letter] = 0.0
+
+        init_matrix[i] = row
+        
+    return init_matrix
+
+def from_psi_blast(file_name):
+    f = open(file_name, "r")
+    
+    nline = 0
+    for line in f:
+    
+        sline = str.split( line )
+        
+        if nline == 0:
+        # recover alphabet
+            alphabet = [str]*len(sline)
+            for i in range(0, len(sline)):
+                alphabet[i] = sline[i]
+                
+            matrix = initialize_matrix(peptide_length, alphabet)
+        
+        else:
+            i = int(sline[0])
+            
+            for j in range(2,len(sline)):
+                matrix[i-1][alphabet[j-2]] = float(sline[j])
+                
+        nline+= 1
+            
+    return matrix
+
+# Conversion from psi-blast to dictionary format
+_w_matrix = data_dir + psi_blast_file 
+w_matrix = from_psi_blast(_w_matrix) 
+print(w_matrix)
+
+SeqPlot(w_matrix)
