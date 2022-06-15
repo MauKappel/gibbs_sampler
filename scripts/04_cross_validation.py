@@ -69,5 +69,4 @@ for full_allele in infile_list:
                            " " + allele_dir + str(training_index[2]) + " > " + training_file], shell=True,
                            stdout=subprocess.PIPE, universal_newlines=True)
             job_list.append("python3 03_gibbs_sampler.py -f " + training_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat)
-
 result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
