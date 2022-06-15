@@ -2,8 +2,6 @@ import numpy as np
 import os
 from argparse import ArgumentParser
 import random
-import sys
-import matplotlib.pylab as plt
 
 parser = ArgumentParser(description="Alignment_O2, if only q or db is provided, sequences will be align within file")
 parser.add_argument("-f", action="store", dest="FILE", default=None, help="File with query sequence")
@@ -245,11 +243,7 @@ t1 = time()
 print("Time (m):,", (t1 - t0) / 60)
 print("-------------------alignment completed-------------------")
 
-plt.imshow(match_matrix, interpolation='nearest')
-plt.savefig(f'../results/02_ava.png')
-plt.close()
-
-# find all peptides which are similar to other peptides other than themselves
+# Hobohm2 main loop
 match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
 drop_list = ['start the loop']
 while len(drop_list) > 0:
@@ -263,18 +257,17 @@ while len(drop_list) > 0:
 
     if len(drop_list) > 0:
         # drop elements first which have the most matches
-        drop = random.choice([drop_list[i] for i, x in enumerate(num_matches) if x == max(num_matches)])
+        drop_idx = random.choice([drop_list[i] for i, x in enumerate(num_matches) if x == max(num_matches)])
 
         # delete row and column
-        match_matrix = np.delete(match_matrix, drop, 0)
-        match_matrix = np.delete(match_matrix, drop, 1)
+        match_matrix = np.delete(match_matrix, drop_idx, 0)
+        match_matrix = np.delete(match_matrix, drop_idx, 1)
+
+        # drop peptide from peptide list
+        peptide_list = np.delete(peptide_list, drop_idx, 0)
 
         # recalculate math vector
         match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
 
-#print(match_matrix)
-plt.imshow(match_matrix, interpolation='nearest')
-plt.savefig(f'../results/02_ava_after_hobohm2.png')
-plt.close()
-#plt.hist(all_matches)
-#plt.savefig('../results/02_alignement_matches.png')
+print(peptide_list.shape)
+
