@@ -277,3 +277,5 @@ for i, peptides in enumerate(peptide_array):
         os.makedirs(dest)
     file = os.path.join(dest, f'c00{i}')
     np.savetxt(file, peptides, fmt='%s')
+    all_file = os.path.join(dest, f'all')
+    np.savetxt(all_file, peptide_list, fmt='%s')
