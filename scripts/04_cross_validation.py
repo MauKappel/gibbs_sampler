@@ -41,33 +41,33 @@ random.seed(seed)
 job = subprocess.run(["ls " + data_dir], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 infile_list = job.stdout.split("\n")
 infile_list.pop()
-#results_dir = script_path + "/../results/" + method
-os.makedirs(results_dir)
+if not os.path.exists(results_dir):
+    os.makedirs(results_dir)
 job_list = []
-for element in infile_list:
-    if allele in element:
-        os.makedirs(results_dir + "/" + allele)
+for full_allele in infile_list:
+    if allele in full_allele:
+        if not os.path.exists(results_dir + "/" + full_allele):
+            os.makedirs(results_dir + "/" + full_allele)
         if method == "hobohm2":
-            hobohm_dir = os.path.join(script_path, "../data/hobohm2/" + allele)
+            hobohm_dir = os.path.join(script_path, "../data/hobohm2/" + full_allele)
             #os.makedirs(hobohm_dir)
-            job = subprocess.run(["python3 02_hobohm2.py -f " + data_dir + allele + "/all" + " -d " + hobohm_dir +
-                                  " -debug True -t 0.02"], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            job = subprocess.run(["python3 02_hobohm2.py -f " + data_dir + full_allele + "/all" + " -d " + hobohm_dir +
+                                  " -debug True -t 0.2"], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             allele_dir = hobohm_dir + "/c00"
             evaluation_file = allele_dir + "0"
         else:
-            allele_dir = data_dir + allele + "/c00"
+            allele_dir = data_dir + full_allele + "/c00"
             evaluation_file = allele_dir + "0"
         for i in range(1, k):
             training_index = list(range(1,k))
             training_index.remove(i)
             test_file = allele_dir + str(i)
-            training_file = results_dir + "/" + allele + "/training_file_" + str(i)
-            out_file_kld = results_dir + "/" + allele + "/kld_file_" + str(i)
-            out_file_mat = results_dir + "/" + allele + "/mat_file_" + str(i)
-            hobohm_out = results_dir + "/" + allele + "/hobohm2_" + str(i)
+            training_file = results_dir + "/" + full_allele + "/training_file_" + str(i)
+            out_file_kld = results_dir + "/" + full_allele + "/kld_file_" + str(i)
+            out_file_mat = results_dir + "/" + full_allele + "/mat_file_" + str(i)
             subprocess.run(["cat " + allele_dir + str(training_index[0]) + " " + allele_dir + str(training_index[1]) +
                            " " + allele_dir + str(training_index[2]) + " > " + training_file], shell=True,
                            stdout=subprocess.PIPE, universal_newlines=True)
             job_list.append("python3 03_gibbs_sampler.py -f " + training_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat)
 
-#result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
+result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
