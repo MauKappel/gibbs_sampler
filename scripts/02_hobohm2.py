@@ -270,12 +270,16 @@ while len(drop_list) > 0:
         # recalculate math vector
         match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
 
+
 peptide_array = np.array_split(peptide_list, 5)
+
+dest = args.DEST
+all_file = os.path.join(dest, f'all')
+np.savetxt(all_file, peptide_list, fmt='%s')
+
 for i, peptides in enumerate(peptide_array):
-    dest = args.DEST
     if not os.path.exists(dest):
         os.makedirs(dest)
     file = os.path.join(dest, f'c00{i}')
     np.savetxt(file, peptides, fmt='%s')
-    all_file = os.path.join(dest, f'all')
-    np.savetxt(all_file, peptide_list, fmt='%s')
+
