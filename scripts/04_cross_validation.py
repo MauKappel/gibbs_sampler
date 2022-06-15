@@ -14,7 +14,7 @@ parser = ArgumentParser(description="Cross-validation")
 parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed (default: 1)")
 parser.add_argument("-a", action="store", dest="allele", type=str, help="Allele (shared string)")
 parser.add_argument("-k", action="store", dest="k", type=int, default=5, help="Cross-validation fold (default: 5)")
-parser.add_argument("-m", action="store", dest="method", type=str, default="Gibbs_sampler", help="Method used in the algorithm")
+parser.add_argument("-m", action="store", dest="method", type=str, default="gibbs_sampler", help="Method used in the algorithm")
 
 args = parser.parse_args()
 seed = args.seed
@@ -44,18 +44,27 @@ infile_list.pop()
 #results_dir = script_path + "/../results/" + method
 os.makedirs(results_dir)
 job_list = []
-for element in infile_list:
-    if allele in element:
-        os.makedirs(results_dir + "/" + element)
-        allele_dir = data_dir + element + "/c00"
-        evaluation_file = allele_dir + "0"
+for allele in infile_list:
+    if allele in allele:
+        os.makedirs(results_dir + "/" + allele)
+        if method == "hobohm2":
+            hobohm_dir = os.path.join(script_path, "../data/hobohm2/" + allele)
+            #os.makedirs(hobohm_dir)
+            job = subprocess.run(["python3 02_hobohm2.py -f " + data_dir + allele + "/all" + " -d " + hobohm_dir +
+                                  " -debug True -t 0.02"], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            allele_dir = hobohm_dir + "/c00"
+            evaluation_file = allele_dir + "0"
+        else:
+            allele_dir = data_dir + allele + "/c00"
+            evaluation_file = allele_dir + "0"
         for i in range(1, k):
             training_index = list(range(1,k))
             training_index.remove(i)
             test_file = allele_dir + str(i)
-            training_file = results_dir + "/" + element + "/training_file_" + str(i)
-            out_file_kld = results_dir + "/" + element + "/kld_file_" + str(i)
-            out_file_mat = results_dir + "/" + element + "/mat_file_" + str(i)
+            training_file = results_dir + "/" + allele + "/training_file_" + str(i)
+            out_file_kld = results_dir + "/" + allele + "/kld_file_" + str(i)
+            out_file_mat = results_dir + "/" + allele + "/mat_file_" + str(i)
+            hobohm_out = results_dir + "/" + allele + "/hobohm2_" + str(i)
             subprocess.run(["cat " + allele_dir + str(training_index[0]) + " " + allele_dir + str(training_index[1]) +
                            " " + allele_dir + str(training_index[2]) + " > " + training_file], shell=True,
                            stdout=subprocess.PIPE, universal_newlines=True)
