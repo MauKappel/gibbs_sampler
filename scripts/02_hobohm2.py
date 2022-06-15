@@ -4,7 +4,8 @@ from argparse import ArgumentParser
 import random
 
 parser = ArgumentParser(description="Alignment_O2, if only q or db is provided, sequences will be align within file")
-parser.add_argument("-f", action="store", dest="FILE", default=None, help="File with query sequence")
+parser.add_argument("-f", action="store", dest="FILE", default=None, help="File with sequences")
+parser.add_argument("-d", action="store", dest="DEST", default=None, help="Destination where file is going to be saved")
 parser.add_argument("-go", action="store", dest="gap_open", type=float, default=-11.0, help="Value of gap open (-11.0)")
 parser.add_argument("-debug", action="store", dest="DEBUG", type=bool, default=False, help="only align a small number of sequences")
 parser.add_argument("-ge", action="store", dest="gap_extension", type=float, default=-1.0,
@@ -269,5 +270,6 @@ while len(drop_list) > 0:
         # recalculate math vector
         match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
 
-print(peptide_list.shape)
 
+dest = args.DEST
+np.savetxt(dest, peptide_list, delimiter=' ')
