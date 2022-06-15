@@ -207,7 +207,7 @@ if args.DEBUG == False:
     peptide_list = np.loadtxt(args.FILE, dtype=str, delimiter=' ').reshape(-1, 2)
 else:
     print('debug_mode')
-    peptide_list = np.loadtxt(args.FILE, dtype=str, delimiter=' ').reshape(-1, 2)[0:15]
+    peptide_list = np.loadtxt(args.FILE, dtype=str, delimiter=' ').reshape(-1, 2)[0:20]
 
 
 from time import time
@@ -270,6 +270,10 @@ while len(drop_list) > 0:
         # recalculate math vector
         match_vector = np.apply_along_axis(sum, axis=1, arr=match_matrix)
 
-
-dest = args.DEST
-np.savetxt(dest, peptide_list, delimiter=' ')
+peptide_array = np.array_split(peptide_list, 5)
+for i, peptides in enumerate(peptide_array):
+    dest = args.DEST
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    file = os.path.join(dest, f'c00{i}')
+    np.savetxt(file, peptides, fmt='%s')
