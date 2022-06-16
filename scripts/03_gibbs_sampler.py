@@ -450,7 +450,7 @@ print("PEPTIDE", "FIRST_POS_CORE", "PEPTIDE[CORE]", "SCORE", "TARGET_VALUE", fil
 for i in range(len(test_peptides)):
     peptide = test_peptides[i]
     score, p1 = score2mat(peptide, log_odds_matrix)
-    print(peptide, p1, peptide[p1:p1+core_len], score, test_targets[i], file = out_file_2)
+    print(peptide, p1, peptide[p1:p1+core_len], np.exp(score), test_targets[i], file = out_file_2)
 out_file_2.close()
 
 # Evaluation part
@@ -463,5 +463,5 @@ print("PEPTIDE", "FIRST_POS_CORE", "PEPTIDE[CORE]", "SCORE", "TARGET_VALUE", fil
 for i in range(len(eval_peptides)):
     peptide = eval_peptides[i]
     score, p1 = score2mat(peptide, log_odds_matrix)
-    print(peptide, p1, peptide[p1:p1+core_len], score, eval_targets[i], file = out_file_3)
+    print(peptide, p1, peptide[p1:p1+core_len], np.exp(score), eval_targets[i], file = out_file_3)
 out_file_3.close()
