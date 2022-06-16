@@ -45,8 +45,10 @@ infile_list.pop()
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)
 job_list = []
+allele_list = []
 for full_allele in infile_list:
     if allele in full_allele:
+        allele_list.append(full_allele)
         if not os.path.exists(results_dir + "/" + full_allele):
             os.makedirs(results_dir + "/" + full_allele)
         if method == "hobohm2":
@@ -79,19 +81,20 @@ for full_allele in infile_list:
 result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
 
 # Wait for all jobs to finish
-#outfile_list = []
-#while len(outfile_list) != len(job_list):
-#    time.sleep(30)  # CHANGE TO MORE TIME ?
+outfile_list = []
+counter_eval = 0
+while len(allele_list) != counter_eval:
+    time.sleep(1)  # CHANGE TO MORE TIME ?
 
-    # Collect the result ## What measure will say that all jobs are done?
-#    job = subprocess.run(["ls " + ], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-#    outfile_list = job.stdout.split("\n")
-#    outfile_list.pop()
-#    if len(outfile_list) == len(job_list):
-#        eval_jobs = []
-#        for file in outfile_list:
-#            output_file = results_dir + "/" + full_allele + "/eval_out"
-#            output_plot = results_dir + "/" + full_allele + "/plot"
-#            eval_jobs.append("pyhton3 05_evaluation_v2.py -e " + evaluation_file + " -mat " + out_file_mat + " -of " + output_file + " -op " + output_plot)
+    # Collect the result ## What measure will say that all jobs are done? Should it be mat_files?
+    job = subprocess.run(["ls " + results_dir + "/" + ], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+    outfile_list = job.stdout.split("\n")
+    outfile_list.pop()
+    if len(outfile_list) == len(job_list):
+        eval_jobs = []
+        for file in outfile_list:
+            output_file = results_dir + "/" + full_allele + "/eval_out"
+            output_plot = results_dir + "/" + full_allele + "/plot"
+            eval_jobs.append("pyhton3 05_evaluation_v2.py -e " + evaluation_file + " -mat " + out_file_mat + " -of " + output_file + " -op " + output_plot)
 # Perform evaluation
 # Retrieve mean of all 4 evaluations
