@@ -14,7 +14,7 @@ parser = ArgumentParser(description="Cross-validation")
 parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed (default: 1)")
 parser.add_argument("-a", action="store", dest="allele", type=str, help="Allele (shared string)")
 parser.add_argument("-k", action="store", dest="k", type=int, default=5, help="Cross-validation fold (default: 5)")
-parser.add_argument("-m", action="store", dest="method", type=str, default="gibbs_sampler", help="Method used in the algorithm")
+parser.add_argument("-m", action="store", dest="method", type=str, default="simple_gibbs", help="Method used in the algorithm (options: simple_gibbs(default), hobohm2, seq_weight)")
 
 args = parser.parse_args()
 seed = args.seed
@@ -68,5 +68,8 @@ for full_allele in infile_list:
             subprocess.run(["cat " + allele_dir + str(training_index[0]) + " " + allele_dir + str(training_index[1]) +
                            " " + allele_dir + str(training_index[2]) + " > " + training_file], shell=True,
                            stdout=subprocess.PIPE, universal_newlines=True)
-            job_list.append("python3 03_gibbs_sampler.py -f " + training_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat)
+            if method == "seq_weight":
+                job_list.append("python3 03_gibbs_sampler.py -w -f " + training_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat)
+            else:
+                job_list.append("python3 03_gibbs_sampler.py -f " + training_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat)
 result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
