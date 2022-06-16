@@ -78,4 +78,7 @@ for full_allele in infile_list:
             else:
                 job_list.append("python3 03_gibbs_sampler.py -f1 " + training_file + " -f2 " + test_file + " -f3 " + evaluation_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat + " -o3 " + out_file_test + " -o4 " + out_file_eval)
 
+# Parallelize Gibbs Sampler call
+result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
+
 # Retrieve mean of all 4 evaluations
