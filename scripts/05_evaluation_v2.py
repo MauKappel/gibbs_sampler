@@ -37,11 +37,11 @@ def plot_roc_curve():
     plt.savefig(output_plot + "_roc.pdf")
 
 eval_data = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
-eval_peptides = eval_data[:, 0]
-eval_targets = eval_data[:, 1].astype(float)
+eval_peptides = eval_data[:, 1].astype(float)
+eval_targets = eval_data[:, 2].astype(float)
 
-eval_targets_class = np.where(float(eval_targets) > 0.426, 1, 0)
-eval_peptides_class = np.where(float(eval_peptides) > 0.426, 1, 0)
+eval_targets_class = np.where(eval_targets > 0.426, 1, 0)
+eval_peptides_class = np.where(eval_peptides > 0.426, 1, 0)
 # Combining targets and prediction values with peptide length in a dataframe
 
 plt.figure(figsize=(7, 7))
