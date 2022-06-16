@@ -12,11 +12,11 @@ parser.add_argument("-w", action="store_true", dest="sequence_weighting", help="
 parser.add_argument("-f", action="store", dest="peptides_file", type=str, help="File with peptides")
 parser.add_argument("-o1", action="store", dest="out_file_kld", type=str, help="Output file for the kld scores")
 parser.add_argument("-o2", action="store", dest="out_file_mat", type=str, help="Output file for the PSSM")
-parser.add_argument("-i", action="store", dest="iters_per_point", type=int,  default=6, help="Number of iteration per data point")
-parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed")
-parser.add_argument("-Ts", action="store", dest="T_i", type=float, default=1.0, help="Start Temp")
-parser.add_argument("-Te", action="store", dest="T_f", type=float, default=0.0001, help="End Temp")
-parser.add_argument("-nT", action="store", dest="T_steps", type=int, default=5, help="Number of T steps")
+parser.add_argument("-i", action="store", dest="iters_per_point", type=int,  default=6, help="Number of iteration per data point (default: 6)")
+parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed (default: 1)")
+parser.add_argument("-Ts", action="store", dest="T_i", type=float, default=1.0, help="Start Temp (default: 1.0)")
+parser.add_argument("-Te", action="store", dest="T_f", type=float, default=0.0001, help="End Temp (default: 0.0001)")
+parser.add_argument("-nT", action="store", dest="T_steps", type=int, default=10, help="Number of T steps (default: 10)")
 args = parser.parse_args()
 beta = args.beta
 sequence_weighting = args.sequence_weighting
