@@ -441,7 +441,7 @@ testing = np.loadtxt(test_file, dtype=str).reshape(-1,2)
 test_peptides = testing[:, 0]
 test_targets = testing[:, 1].astype(float)
 
-out_file_2 = open(out_file_test)
+out_file_2 = open(out_file_test, "w")
 for i in range(len(test_peptides)):
     peptide = test_peptides[i]
     score, p1 = score2mat(peptide, log_odds_matrix)
