@@ -15,7 +15,7 @@ parser = ArgumentParser(description="GibbsSampler evaluation")
 parser.add_argument("-e", action="store", dest="eval_file", type=str, help="File with evaluation data")
 parser.add_argument("-mat", action="store", dest="psi_blast_file", type=str, help="File containing weighted scores")
 parser.add_argument("-of", action="store", dest="output_file", type=str, help="Output file")
-parser.add_argument("-op", action="store", dest="output_plot", type=str, help="Output plot")
+parser.add_argument("-op", action="store", dest="output_plot", type=str, help="Output plot file")
 
 args = parser.parse_args()
 eval_file = args.eval_file
@@ -34,6 +34,7 @@ def plot_roc_curve():
     plt.plot([0, 1], [0, 1], c='black', linestyle='--')
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
+    plt.savefig(output_plot + "_roc.pdf")
 
 eval_data = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
 eval_peptides = eval_data[:, 0]
@@ -61,7 +62,7 @@ def plot_mcc():
     plt.legend(loc='lower right')
     plt.ylabel('Predicted')
     plt.xlabel('Validation targets')
-    plt.savefig(output_plot)
+    plt.savefig(output_plot + "_mcc.pdf")
 
 plot_mcc()
 
