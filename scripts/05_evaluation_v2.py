@@ -142,3 +142,5 @@ w_matrix = from_psi_blast(psi_blast_file)
 print(w_matrix, file = output_file)
 
 SeqPlot(w_matrix)
+logo_name = '_' + psi_blast_file + 'seqlogo.pdf'
+plt.savefig(logo_name)
