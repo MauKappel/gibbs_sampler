@@ -12,12 +12,14 @@ import os
 
 parser = ArgumentParser(description="GibbsSampler evaluation")
 
+parser.add_argument("-k", action="store", dest="k", type=int, default=5, help="Number of cross-validation folds (default: 5)")
 parser.add_argument("-e", action="store", dest="eval_file", type=str, help="File with evaluation data")
 parser.add_argument("-mat", action="store", dest="psi_blast_file", type=str, help="File containing weighted scores")
 parser.add_argument("-of", action="store", dest="output_file", type=str, help="Output file")
 parser.add_argument("-op", action="store", dest="output_plot", type=str, help="Output plot file")
 
 args = parser.parse_args()
+k = args.k
 eval_file = args.eval_file
 psi_blast_file = args.psi_blast_file
 output_file = args.output_file
@@ -35,6 +37,8 @@ def plot_roc_curve():
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     plt.savefig(output_plot + "_roc.pdf")
+
+# Add a for loop to retrieve all 4 evaluation files
 
 eval_data = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
 eval_peptides = eval_data[:, 1].astype(float)
