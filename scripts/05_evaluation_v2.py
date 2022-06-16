@@ -12,17 +12,14 @@ import os
 
 parser = ArgumentParser(description="GibbsSampler evaluation")
 
-parser.add_argument("-p", action="store", dest="eval_peptides_file", type=str, help="File with predicted data")
-parser.add_argument("-e", action="store", dest="eval_targets_file", type=str, help="File with evaluation data")
+parser.add_argument("-e", action="store", dest="eval_file", type=str, help="File with evaluation data")
 parser.add_argument("-mat", action="store", dest="psi_blast_file", type=str, help="File containing weighted scores")
+parser.add_argument("-o", action="store", dest="output_file", type=str, help="Output file")
 
 args = parser.parse_args()
-eval_targets_file = args.eval_targets_file
-eval_peptides_file = args.eval_peptides_file
+eval_file = args.eval_file
 psi_blast_file = args.psi_blast_file
-
-script_path = os.getcwd()
-data_dir = script_path + "/"
+output_file = args.output_file
 
 #------------------------------------------------------------------------------------#
 # ROC curve
@@ -36,11 +33,9 @@ def plot_roc_curve():
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
 
-eval_targets_file = data_dir + eval_targets_file
-eval_targets = np.loadtxt(eval_targets_file, dtype=str)[:,1]
-eval_peptides_file = data_dir + eval_peptides_file
-eval_peptides = np.loadtxt(eval_peptides_file, dtype=str)[:,1]
-
+eval_data = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
+eval_peptides = eval_data[:, 0]
+eval_targets = eval_data[:, 1].astype(float)
 
 eval_targets_class = np.where(float(eval_targets) > 0.426, 1, 0)
 eval_peptides_class = np.where(float(eval_peptides) > 0.426, 1, 0)
@@ -141,8 +136,7 @@ def from_psi_blast(file_name):
     return matrix
 
 # Conversion from psi-blast to dictionary format
-_w_matrix = data_dir + psi_blast_file 
-w_matrix = from_psi_blast(_w_matrix) 
-print(w_matrix)
+w_matrix = from_psi_blast(psi_blast_file)
+print(w_matrix, file = output_file)
 
 SeqPlot(w_matrix)
