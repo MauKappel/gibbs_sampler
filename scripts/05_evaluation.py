@@ -143,6 +143,7 @@ def from_psi_blast(file_name):
 # Conversion from psi-blast to dictionary format
 _w_matrix = data_dir + psi_blast_file 
 w_matrix = from_psi_blast(_w_matrix) 
-print(w_matrix)
 
-SeqPlot(w_matrix)
+logo = SeqPlot(w_matrix)
+logo_name = '_' + psi_blast_file + 'seqlogo.pdf'
+plt.savefig(logo_name)
