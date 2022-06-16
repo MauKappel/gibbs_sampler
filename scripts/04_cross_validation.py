@@ -90,14 +90,14 @@ result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
 # INCLUDE SLEEP STEP?
 
 # Retrieve mean of all 4 evaluations
-eval_job_list = []
-for allele in allele_list:
-    allele_dir = results_dir + "/" + allele + "/"
-    eval_file = allele_dir + "eval_out_"
-    mat_file = allele_dir + "mat_file_"
-    output_file = allele_dir + "final_out"
-    output_plot = allele_dir + "plot"
-    eval_job_list.append("python3 05_evaluation_v2.py -k " + k + " -e " + eval_file + " -mat " + mat_file + " -of " + output_file + " -op " + output_plot)
+#eval_job_list = []
+#for allele in allele_list:
+#    allele_dir = results_dir + "/" + allele + "/"
+#    eval_file = allele_dir + "eval_out_"
+#    mat_file = allele_dir + "mat_file_"
+#    output_file = allele_dir + "final_out"
+#    output_plot = allele_dir + "plot"
+#    eval_job_list.append("python3 05_evaluation_v2.py -k " + str(k) + " -e " + eval_file + " -mat " + mat_file + " -of " + output_file + " -op " + output_plot)
 
 # Parallelize Evaluation call
-result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in eval_job_list)
+#result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in eval_job_list)
