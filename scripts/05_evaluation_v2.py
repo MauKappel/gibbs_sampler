@@ -14,12 +14,14 @@ parser = ArgumentParser(description="GibbsSampler evaluation")
 
 parser.add_argument("-e", action="store", dest="eval_file", type=str, help="File with evaluation data")
 parser.add_argument("-mat", action="store", dest="psi_blast_file", type=str, help="File containing weighted scores")
-parser.add_argument("-o", action="store", dest="output_file", type=str, help="Output file")
+parser.add_argument("-of", action="store", dest="output_file", type=str, help="Output file")
+parser.add_argument("-op", action="store", dest="output_plot", type=str, help="Output plot")
 
 args = parser.parse_args()
 eval_file = args.eval_file
 psi_blast_file = args.psi_blast_file
 output_file = args.output_file
+output_plot = args.output_plot
 
 #------------------------------------------------------------------------------------#
 # ROC curve
@@ -59,8 +61,7 @@ def plot_mcc():
     plt.legend(loc='lower right')
     plt.ylabel('Predicted')
     plt.xlabel('Validation targets')
-    plt.show()
-
+    plt.savefig(output_plot)
 
 plot_mcc()
 
