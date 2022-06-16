@@ -69,32 +69,13 @@ for full_allele in infile_list:
             out_file_kld = results_dir + "/" + full_allele + "/kld_file_" + str(i)
             out_file_mat = results_dir + "/" + full_allele + "/mat_file_" + str(i)
             out_file_test = results_dir + "/" + full_allele + "/test_out_" + str(i)
+            out_file_eval = results_dir + "/" + full_allele + "/eval_out_" + str(i)
             subprocess.run(["cat " + allele_dir + str(training_index[0]) + " " + allele_dir + str(training_index[1]) +
                            " " + allele_dir + str(training_index[2]) + " > " + training_file], shell=True,
                            stdout=subprocess.PIPE, universal_newlines=True)
             if method == "seq_weight":
-                job_list.append("python3 03_gibbs_sampler.py -w -f1 " + training_file + " -f2 " + test_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat + " -o3 " + out_file_test)
+                job_list.append("python3 03_gibbs_sampler.py -w -f1 " + training_file + " -f2 " + test_file + " -f3 " + evaluation_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat + " -o3 " + out_file_test + " -o4 " + out_file_eval)
             else:
-                job_list.append("python3 03_gibbs_sampler.py -f1 " + training_file + " -f2 " + test_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat + " -o3 " + out_file_test)
+                job_list.append("python3 03_gibbs_sampler.py -f1 " + training_file + " -f2 " + test_file + " -f3 " + evaluation_file + " -o1 " + out_file_kld + " -o2 " + out_file_mat + " -o3 " + out_file_test + " -o4 " + out_file_eval)
 
-# Parallelize Gibbs Sampler call
-result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
-
-# Wait for all jobs to finish
-outfile_list = []
-counter_eval = 0
-while len(allele_list) != counter_eval:
-    time.sleep(1)  # CHANGE TO MORE TIME ?
-
-    # Collect the result ## What measure will say that all jobs are done? Should it be mat_files?
-    job = subprocess.run(["ls " + results_dir + "/" + ], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-    outfile_list = job.stdout.split("\n")
-    outfile_list.pop()
-    if len(outfile_list) == len(job_list):
-        eval_jobs = []
-        for file in outfile_list:
-            output_file = results_dir + "/" + full_allele + "/eval_out"
-            output_plot = results_dir + "/" + full_allele + "/plot"
-            eval_jobs.append("pyhton3 05_evaluation_v2.py -e " + evaluation_file + " -mat " + out_file_mat + " -of " + output_file + " -op " + output_plot)
-# Perform evaluation
 # Retrieve mean of all 4 evaluations

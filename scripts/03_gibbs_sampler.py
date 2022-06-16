@@ -11,9 +11,11 @@ parser.add_argument("-b", action="store", dest="beta", type=float, default=50.0,
 parser.add_argument("-w", action="store_true", dest="sequence_weighting", help="Use Sequence weighting")
 parser.add_argument("-f1", action="store", dest="training_file", type=str, help="File with training peptides")
 parser.add_argument("-f2", action="store", dest="test_file", type=str, help="File with test peptides")
+parser.add_argument("-f3", action="store", dest="eval_file", type=str, help="File with evaluation peptides")
 parser.add_argument("-o1", action="store", dest="out_file_kld", type=str, help="Output file for the kld scores")
 parser.add_argument("-o2", action="store", dest="out_file_mat", type=str, help="Output file for the PSSM")
 parser.add_argument("-o3", action="store", dest="out_file_test", type=str, help="Output file for testing")
+parser.add_argument("-o4", action="store", dest="out_file_eval", type=str, help="Output file for evaluating")
 parser.add_argument("-i", action="store", dest="iters_per_point", type=int,  default=6, help="Number of iteration per data point (default: 6)")
 parser.add_argument("-s", action="store", dest="seed", type=int, default=1, help="Random number seed (default: 1)")
 parser.add_argument("-Ts", action="store", dest="T_i", type=float, default=1.0, help="Start Temp (default: 1.0)")
@@ -24,9 +26,11 @@ beta = args.beta
 sequence_weighting = args.sequence_weighting
 training_file = args.training_file
 test_file = args.test_file
+eval_file = args.eval_file
 out_file_kld = args.out_file_kld
 out_file_mat = args.out_file_mat
 out_file_test = args.out_file_test
+out_file_eval = args.out_file_eval
 iters_per_point = args.iters_per_point
 seed = args.seed
 T_i = args.T_i
@@ -448,3 +452,16 @@ for i in range(len(test_peptides)):
     score, p1 = score2mat(peptide, log_odds_matrix)
     print(peptide, p1, peptide[p1:p1+core_len], score, test_targets[i], file = out_file_2)
 out_file_2.close()
+
+# Evaluation part
+evaluating = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
+eval_peptides = testing[:, 0]
+eval_targets = testing[:, 1].astype(float)
+
+out_file_3 = open(out_file_eval, "w")
+print("PEPTIDE", "FIRST_POS_CORE", "PEPTIDE[CORE]", "SCORE", "TARGET_VALUE", file = out_file_3)
+for i in range(len(eval_peptides)):
+    peptide = eval_peptides[i]
+    score, p1 = score2mat(peptide, log_odds_matrix)
+    print(peptide, p1, peptide[p1:p1+core_len], score, eval_targets[i], file = out_file_3)
+out_file_3.close()
