@@ -47,6 +47,7 @@ job_list = []
 allele_list = []
 for full_allele in infile_list:
     if allele in full_allele:
+        raw_data_dir = os.path.join(data_dir, "../raw_data/" + full_allele)
         allele_list.append(full_allele)
         if not os.path.exists(results_dir + "/" + full_allele):
             os.makedirs(results_dir + "/" + full_allele)
@@ -66,11 +67,11 @@ for full_allele in infile_list:
             allele_dir = hobohm_dir + "/c00"
         else:
             allele_dir = data_dir + full_allele + "/c00"
-        evaluation_file = os.path.join(data_dir, "../raw_data/" + full_allele + "/c000")
+        evaluation_file = raw_data_dir + "/c000"
         for i in range(1, k):
             training_index = list(range(1,k))
             training_index.remove(i)
-            test_file = allele_dir + str(i)
+            test_file = raw_data_dir + "/c00" + str(i)
             training_file = results_dir + "/" + full_allele + "/training_file_" + str(i)
             out_file_kld = results_dir + "/" + full_allele + "/kld_file_" + str(i)
             out_file_mat = results_dir + "/" + full_allele + "/mat_file_" + str(i)
@@ -89,15 +90,15 @@ result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
 
 # INCLUDE SLEEP STEP?
 
-# Retrieve mean of all 4 evaluations
-#eval_job_list = []
-#for allele in allele_list:
-#    allele_dir = results_dir + "/" + allele + "/"
-#    eval_file = allele_dir + "eval_out_"
-#    mat_file = allele_dir + "mat_file_"
-#    output_file = allele_dir + "final_out"
-#    output_plot = allele_dir + "plot"
-#    eval_job_list.append("python3 05_evaluation_single.py -k " + str(k) + " -e " + eval_file + " -mat " + mat_file + " -of " + output_file + " -op " + output_plot)
+# Perform ensable and performance analysis
+eval_job_list = []
+for allele in allele_list:
+    eval_path = results_dir + "/" + allele
+    output_file = eval_path + "/final_out"
+    output_plot = eval_path + "/plot"
+    eval_job_list.append("python3 05_evaluation_single.py -k " + str(k) + " -p " + eval_path + " -of " + output_file + " -op " + output_plot)
 
 # Parallelize Evaluation call
-#result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in eval_job_list)
+result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in eval_job_list)
+
+## END ##

@@ -29,7 +29,7 @@ def plot_mcc(k):
     plt.legend(loc='lower right')
     plt.ylabel('Predicted')
     plt.xlabel('Validation targets')
-    plt.savefig(output_plot + "_mcc_" + k + ".pdf")
+    plt.savefig(output_plot + "_mcc_" + str(k) + ".pdf")
 
 def plot_roc_curve(k):
     plt.title('Receiver Operating Characteristic')
@@ -38,7 +38,7 @@ def plot_roc_curve(k):
     plt.plot([0, 1], [0, 1], c='black', linestyle='--')
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
-    plt.savefig(output_plot + "_roc_" + k + ".pdf")
+    plt.savefig(output_plot + "_roc_" + str(k) + ".pdf")
 
 def plot_pcc(k):
     plt.title('Pearson Correlation Coefficient')
@@ -46,70 +46,70 @@ def plot_pcc(k):
     plt.legend(loc='lower right')
     plt.ylabel('Predicted')
     plt.xlabel('Validation targets')
-    plt.savefig(output_plot + "_pcc_" + k + ".pdf")
+    plt.savefig(output_plot + "_pcc_" + str(k) + ".pdf")
 
 def SeqPlot(weight_matrix):
-"""
-Creates a simple sequence logo from a weight matrix
-Weight matrix is produced via 'from_psi_blast' function
-"""
-SeqPlot = lm.Logo(df = pd.DataFrame(weight_matrix),
-                  fade_below=0.5,
-                  shade_below=0.5,
-                  figsize=(15,7))
+    """
+    Creates a simple sequence logo from a weight matrix
+    Weight matrix is produced via 'from_psi_blast' function
+    """
+    SeqPlot = lm.Logo(df = pd.DataFrame(weight_matrix),
+                    fade_below=0.5,
+                    shade_below=0.5,
+                    figsize=(15,7))
 
-# set axis labels
-SeqPlot.ax.set_xlabel('Amino acid position', fontsize=14)
-SeqPlot.ax.set_ylabel('bits', fontsize=14)
+    # set axis labels
+    SeqPlot.ax.set_xlabel('Amino acid position', fontsize=14)
+    SeqPlot.ax.set_ylabel('bits', fontsize=14)
 
-# Highlighting specific or range of amino acids
-#SeqPlot.highlight_position(2,color='lightgray',alpha=0.5)
-#SeqPlot.highlight_position_range(2,6,alpha=0.5,color='lightgray')
-return SeqPlot
+    # Highlighting specific or range of amino acids
+    #SeqPlot.highlight_position(2,color='lightgray',alpha=0.5)
+    #SeqPlot.highlight_position_range(2,6,alpha=0.5,color='lightgray')
+    return SeqPlot
 
 def initialize_matrix(peptide_length, alphabet):
-init_matrix = [0]*peptide_length
+    init_matrix = [0]*peptide_length
 
-for i in range(0, peptide_length):
+    for i in range(0, peptide_length):
 
-    row = {}
+        row = {}
 
-    for letter in alphabet:
-        row[letter] = 0.0
+        for letter in alphabet:
+            row[letter] = 0.0
 
-    init_matrix[i] = row
+        init_matrix[i] = row
 
-return init_matrix
+    return init_matrix
 
 def from_psi_blast(file_name):
-f = open(file_name, "r")
+    f = open(file_name, "r")
 
-nline = 0
-for line in f:
+    nline = 0
+    for line in f:
 
-    sline = str.split( line )
+        sline = str.split( line )
 
-    if nline == 0:
-    # recover alphabet
-        alphabet = [str]*len(sline)
-        for i in range(0, len(sline)):
-            alphabet[i] = sline[i]
+        if nline == 0:
+        # recover alphabet
+            alphabet = [str]*len(sline)
+            for i in range(0, len(sline)):
+                alphabet[i] = sline[i]
 
-        matrix = initialize_matrix(peptide_length, alphabet)
+            matrix = initialize_matrix(peptide_length, alphabet)
 
-    else:
-        i = int(sline[0])
+        else:
+            i = int(sline[0])
 
-        for j in range(2,len(sline)):
-            matrix[i-1][alphabet[j-2]] = float(sline[j])
+            for j in range(2,len(sline)):
+                matrix[i-1][alphabet[j-2]] = float(sline[j])
 
-    nline+= 1
+        nline+= 1
 
-return matrix
+    return matrix
 
 
 for i in range(1, k):
-    eval_data = np.loadtxt(path + "/eval_out_" + i, dtype=str).reshape(-1,5)
+    eval_data = np.loadtxt(path + "/eval_out_" + str(i), dtype=str).reshape(-1,5)
 
     eval_peptides = eval_data[1:, 2]
     eval_prediction = eval_data[1:, 3].astype(float)
@@ -149,9 +149,9 @@ for i in range(1, k):
     #peptide_length = 9
 
     # Conversion from psi-blast to dictionary format
-    w_matrix = from_psi_blast(path + "/mat_file_" + i)
-    print(w_matrix, file = open(path + "/output_" + i, 'w'))
+    w_matrix = from_psi_blast(path + "/mat_file_" + str(i))
+    print(w_matrix, file = open(path + "/output_" + str(i), 'w'))
 
     SeqPlot(w_matrix)
-    logo_name = path + "/" + psi_blast_file + "_seqlogo_" + i + ".pdf"
+    logo_name = path + "/seqlogo_" + str(i) + ".pdf"
     plt.savefig(logo_name)
