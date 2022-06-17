@@ -5,6 +5,8 @@ from sklearn.metrics import roc_curve, auc, matthews_corrcoef
 from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
+from os.path import isdir, isfile
+from os import listdir
 import pandas as pd
 import logomaker as lm
 import os
@@ -55,7 +57,7 @@ eval_targets = []
 eval_targets_class = []
 eval_prediction_class = []
 
-for eval_file in path:
+for eval_file in list(filter(lambda x: isdir(f"{path}\\{x}"), listdir(path))):
     for i in range(1, k):
         eval_data = np.loadtxt(eval_file + "/eval_out_" + i, dtype=str).reshape(-1, 5)
         eval_peptides = np.concatenate((eval_peptides, eval_data[1:, 2]), axis=0)
