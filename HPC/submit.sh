@@ -38,10 +38,14 @@ pip install  networkx
 pip install --user matplotlib
 pip install seaborn
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+pip install subprocess
+pip install joblib
+pip install scikit-learn
+pip install logomaker
 
-#python3 /zhome/4c/8/164840/projects/UVSNet/scripts/01_simulate_compounds.py
-#python3 /zhome/4c/8/164840/projects/UVSNet/scripts/02_simulate_strain_collection.py
-#python3 /zhome/4c/8/164840/projects/UVSNet/scripts/04_train.py
-python3 /zhome/4c/8/164840/projects/UVSNet/scripts/05_train_AL.py
-python3 /zhome/4c/8/164840/projects/UVSNet/scripts/06_train_RL.py
-python3 /zhome/4c/8/164840/projects/UVSNet/scripts/07_model_analysis.py
+python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m seq_weight
+python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m seq_weight
+python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m hobohm1
+python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m hobohm1
+python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m hobohm2
+python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m hobohm2
