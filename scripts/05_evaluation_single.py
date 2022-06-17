@@ -12,7 +12,7 @@ import os
 
 parser = ArgumentParser(description="GibbsSampler evaluation")
 
-parser.add_argument("-k", action="store", dest="k", type=int, default=4, help="Number of cross-validation folds (default: 4)")
+parser.add_argument("-k", action="store", dest="k", type=int, default=5, help="Number of cross-validation folds (default: 5)")
 parser.add_argument("-p", action="store", dest="path", type=str, help="Path with evaluation data and weighted scores")
 parser.add_argument("-of", action="store", dest="output_file", type=str, help="Output file")
 parser.add_argument("-op", action="store", dest="output_plot", type=str, help="Output plot file")
