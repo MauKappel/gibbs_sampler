@@ -107,7 +107,7 @@ for line in f:
 
 return matrix
 
-# Add a for loop to retrieve all 4 evaluation files
+
 for i in range(1, k):
     eval_data = np.loadtxt(path + "/eval_out_" + i, dtype=str).reshape(-1,5)
 
