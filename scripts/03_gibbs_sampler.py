@@ -455,8 +455,8 @@ out_file_2.close()
 
 # Evaluation part
 evaluating = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
-eval_peptides = testing[:, 0]
-eval_targets = testing[:, 1].astype(float)
+eval_peptides = evaluating[:, 0]
+eval_targets = evaluating[:, 1].astype(float)
 
 out_file_3 = open(out_file_eval, "w")
 print("PEPTIDE", "FIRST_POS_CORE", "PEPTIDE[CORE]", "SCORE", "TARGET_VALUE", file = out_file_3)
