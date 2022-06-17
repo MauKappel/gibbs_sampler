@@ -13,8 +13,8 @@ import os
 
 parser = ArgumentParser(description="GibbsSampler evaluation")
 
-parser.add_argument("-k", action="store", dest="k", type=int, default=4,
-                    help="Number of cross-validation folds (default: 4)")
+parser.add_argument("-k", action="store", dest="k", type=int, default=5,
+                    help="Number of cross-validation folds (default: 5)")
 parser.add_argument("-p", action="store", dest="path", type=str,
                     help="Path with evaluation data/ weighted scores/ output path (e.g. simple_gibbs)")
 
