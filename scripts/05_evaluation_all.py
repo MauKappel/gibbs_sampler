@@ -57,6 +57,7 @@ eval_targets = []
 eval_targets_class = []
 eval_prediction_class = []
 
+# Iterate through folders in path (e.g. results/simple_gibbs/DRB1_...)
 for eval_file in list(filter(lambda x: isdir(f"{path}\\{x}"), listdir(path))):
     for i in range(1, k):
         eval_data = np.loadtxt(eval_file + "/eval_out_" + i, dtype=str).reshape(-1, 5)
