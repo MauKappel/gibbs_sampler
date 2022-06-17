@@ -28,10 +28,9 @@ output_plot = args.output_plot
 #------------------------------------------------------------------------------------#
 # ROC curve
 #------------------------------------------------------------------------------------#
-
 def plot_roc_curve():
     plt.title('Receiver Operating Characteristic')
-    plt.plot(fpr, tpr, label='AUC = %0.3f (%smer)' % (roc_auc))
+    plt.plot(fpr, tpr, label='AUC = %0.3f' % (roc_auc))
     plt.legend(loc='lower right')
     plt.plot([0, 1], [0, 1], c='black', linestyle='--')
     plt.ylabel('True Positive Rate')
@@ -40,29 +39,31 @@ def plot_roc_curve():
 
 # Add a for loop to retrieve all 4 evaluation files
 
-eval_data = np.loadtxt(eval_file, dtype=str).reshape(-1,2)
-eval_peptides = eval_data[:, 1].astype(float)
-eval_targets = eval_data[:, 2].astype(float)
+eval_data = np.loadtxt(eval_file, dtype=str).reshape(-1,5)
+
+eval_peptides = eval_data[1:, 2]
+eval_prediction = eval_data[1:, 3].astype(float)
+eval_targets = eval_data[1:, 4].astype(float)
 
 eval_targets_class = np.where(eval_targets > 0.426, 1, 0)
-eval_peptides_class = np.where(eval_peptides > 0.426, 1, 0)
+eval_prediction_class = np.where(eval_prediction > 0.426, 1, 0)
 # Combining targets and prediction values with peptide length in a dataframe
 
 plt.figure(figsize=(7, 7))
 # For each peptide length compute AUC and plot ROC
-fpr, tpr, threshold = roc_curve(eval_targets_class, eval_peptides_class)
+fpr, tpr, threshold = roc_curve(eval_targets_class, eval_prediction)
 roc_auc = auc(fpr, tpr)
 plot_roc_curve()
 
 #------------------------------------------------------------------------------------#
 # MCC
 #------------------------------------------------------------------------------------#
-mcc = matthews_corrcoef(eval_targets_class, eval_peptides_class)
-
+plt.figure(figsize=(7, 7))
+mcc = matthews_corrcoef(eval_targets_class, eval_prediction_class)
 
 def plot_mcc():
     plt.title('Matthews Correlation Coefficient')
-    plt.scatter(eval_targets, eval_peptides, label='MCC = %0.3f' % mcc)
+    plt.scatter(eval_targets, eval_prediction, label='MCC = %0.3f' % mcc)
     plt.legend(loc='lower right')
     plt.ylabel('Predicted')
     plt.xlabel('Validation targets')
@@ -70,12 +71,18 @@ def plot_mcc():
 
 plot_mcc()
 
-pcc = pearsonr(eval_targets, eval_peptides)
-print("PCC: ", pcc[0])
+plt.figure(figsize=(7, 7))
+pcc = pearsonr(eval_targets, eval_prediction)
 
-plt.scatter(eval_peptides, eval_targets);
+def plot_pcc():
+    plt.title('Pearson Correlation Coefficient')
+    plt.scatter(eval_targets, eval_prediction, label='PCC = %0.3f' % pcc[0])
+    plt.legend(loc='lower right')
+    plt.ylabel('Predicted')
+    plt.xlabel('Validation targets')
+    plt.savefig(output_plot + "_pcc.pdf")
 
-
+plot_pcc()
 #------------------------------------------------------------------------------------#
 # Functions
 #------------------------------------------------------------------------------------#
@@ -143,8 +150,8 @@ def from_psi_blast(file_name):
 
 # Conversion from psi-blast to dictionary format
 w_matrix = from_psi_blast(psi_blast_file)
-print(w_matrix, file = output_file)
+print(w_matrix, file = open(output_file, 'w'))
 
 SeqPlot(w_matrix)
-logo_name = '_' + psi_blast_file + 'seqlogo.pdf'
+logo_name = psi_blast_file + 'seqlogo.pdf'
 plt.savefig(logo_name)
