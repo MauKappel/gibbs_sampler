@@ -55,8 +55,8 @@ for full_allele in infile_list:
             hobohm_dir = os.path.join(script_path, "../data/hobohm2/" + full_allele)
             if not os.path.exists(hobohm_dir):
                 os.makedirs(hobohm_dir)
-            job = subprocess.run(["python3 02_hobohm2.py -f " + data_dir + full_allele + "/all" + " -d " + hobohm_dir +
-                                  " -debug True -t 0.2"], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            job = subprocess.run(["python3 02_hobohm2.py -f " + data_dir + full_allele + "/all" + " -d " + hobohm_dir],
+                                 shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             allele_dir = hobohm_dir + "/c00"
         elif method == "hobohm1":
             hobohm_dir = os.path.join(script_path, "../data/hobohm1/" + full_allele)
