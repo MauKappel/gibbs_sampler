@@ -88,8 +88,6 @@ for full_allele in infile_list:
 # Parallelize Gibbs Sampler call
 result = Parallel(n_jobs=8)(delayed(unix_call)(job) for job in job_list)
 
-# INCLUDE SLEEP STEP?
-
 # Perform ensable and performance analysis
 eval_job_list = []
 for allele in allele_list:
