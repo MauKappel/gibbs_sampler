@@ -10,7 +10,7 @@ parser.add_argument("-go", action="store", dest="gap_open", type=float, default=
 parser.add_argument("-debug", action="store", dest="DEBUG", type=bool, default=False, help="only align a small number of sequences")
 parser.add_argument("-ge", action="store", dest="gap_extension", type=float, default=-1.0,
                     help="Value of gap extension (-1.0)")
-parser.add_argument("-t", action="store", dest="thresh", type=float, default=0.3, help="Value of similarity theshold (0.3)")
+parser.add_argument("-t", action="store", dest="thresh", type=float, default=0.8, help="Value of similarity theshold (0.3)")
 
 args = parser.parse_args()
 gap_open = args.gap_open
