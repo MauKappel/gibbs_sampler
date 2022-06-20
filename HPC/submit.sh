@@ -44,7 +44,7 @@ pip install logomaker
 
 #python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m seq_weight
 #python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m seq_weight
-python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m hobohm1
-python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m hobohm1
+#python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m hobohm1
+#python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m hobohm1
 python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a DRB -m hobohm2
 python3 /zhome/4c/8/164840/projects/gibbs_sampler/scripts/04_cross_validation.py -a I -m hobohm2
